@@ -58,7 +58,11 @@ public class DoublyLinkedList implements LinkedList{
             baru.prev = temp;
             baru.next = temp.next;
             temp.next = baru;
-            baru.next.prev = baru;
+            if (baru.next != null){
+                baru.next.prev = baru;
+            } else {
+                tail = baru; // disisipkan setelah tail
+            }
             size++;
         }
     }
@@ -120,29 +124,83 @@ public class DoublyLinkedList implements LinkedList{
         }
     }
 
+    // mengembalikan data pada index ke-i (head = index 0)
     @Override
     public Object get(int index) {
-        // TODO digunakan untuk mengembalikan data pada index ke-i dimulai dari head. Head memiliki index 0
-        return null;
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+        Node2P current;
+        if (index < size / 2) {              // lebih dekat ke head
+            current = head;
+            for (int i = 0; i < index; i++) {
+                current = current.next;
+            }
+        } else {                             // lebih dekat ke tail
+            current = tail;
+            for (int i = size - 1; i > index; i--) {
+                current = current.prev;
+            }
+        }
+        return current.data;
     }
+
+    // mencari kemunculan pertama targetData, -1 jika tidak ada
     @Override
     public int indexOf(Object targetData) {
-        // TODO digunakan mencari kemunculan pertama targetData pada linked list dan mengembalikan indeksnya. Indeks dari head adalah 0. Jika tidak ada targetData pada linked list, kembalikan nilai -1 
-        return 0;
+        Node2P current = head;
+        int i = 0;
+        while (current != null) {
+            if (current.data == null ? targetData == null : current.data.equals(targetData)) {
+                return i;
+            }
+            current = current.next;
+            i++;
+        }
+        return -1;
     }
+
+    // mencetak dari tail ke head memakai pointer prev
     @Override
     public void printReverse() {
-        // TODO digunakan untuk mencetak data pada linked list dengan urutan terbalik, dari tail ke head.
-        
+        Node2P current = tail;
+        while (current != null) {
+            System.out.println(current.data);
+            current = current.prev;
+        }
     }
+
+    // mencari dan menghapus node pertama dengan data = targetData
     @Override
     public boolean remove(Object targetData) {
-        // TODO digunakan untuk mencari dan menghapus node dengan data=targetData pada linked list serta mengembalikan nilai True jika berhasil, dan False jika targetData tidak ada di linkedList
+        Node2P current = head;
+        while (current != null) {
+            if (current.data == null ? targetData == null : current.data.equals(targetData)) {
+                if (current == head) {
+                    deleteFirst();
+                } else if (current == tail) {
+                    deleteLast();
+                } else {
+                    current.prev.next = current.next;
+                    current.next.prev = current.prev;
+                    size--;
+                }
+                return true;
+            }
+            current = current.next;
+        }
         return false;
     }
+
+    // seluruh data dari head sampai tail dalam bentuk array
     @Override
     public Object[] toArray() {
-        // TODO digunakan untuk mendapatkan keseluruhan data pada node-node di linked list dalam bentuk array. Data-data pada array disusun secara urut mulai dari head sampai dengan tail.
-        return null;
+        Object[] arr = new Object[size];
+        Node2P current = head;
+        for (int i = 0; i < size; i++) {
+            arr[i] = current.data;
+            current = current.next;
+        }
+        return arr;
     }
 }
